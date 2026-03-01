@@ -272,7 +272,6 @@ int main(int argc, char** argv) {
     std::string weights_path = "out/mlp_weights.txt";
     std::string dataset_path = "out/tokenized_dataset.txt";
     std::string emb_path = "out/embedding_matrix.txt"; // embedding file
-    int vocab_size = 30522;
     int threads = 128;
     int max_print = 10;
 
@@ -281,7 +280,6 @@ int main(int argc, char** argv) {
         if (a == "--weights" && i + 1 < argc) weights_path = argv[++i];
         else if (a == "--dataset" && i + 1 < argc) dataset_path = argv[++i];
         else if (a == "--embeddings" && i + 1 < argc) emb_path = argv[++i];
-        else if (a == "--vocab-size" && i + 1 < argc) vocab_size = std::stoi(argv[++i]);
         else if (a == "--threads" && i + 1 < argc) threads = std::stoi(argv[++i]);
         else if (a == "--print" && i + 1 < argc) max_print = std::stoi(argv[++i]);
         else {

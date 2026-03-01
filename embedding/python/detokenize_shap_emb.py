@@ -79,14 +79,22 @@ def main():
     shap_vals = read_shap_values(shap_csv, seq_len)
     vocab = load_vocab_list(args.vocab)
 
-    tokens = [vocab[t] if 0 <= t < len(vocab) else "<unk>" for t in token_ids]
+    # Build rows (original_index, token_id, token_str, shap_value)
+    rows = []
+    for i, tid in enumerate(token_ids):
+        tok = vocab[tid] if 0 <= tid < len(vocab) else "<unk>"
+        val = shap_vals[i] if i < len(shap_vals) else 0.0
+        rows.append((i, tid, tok, val))
+
+    # Sort by shap value descending (largest first)
+    rows.sort(key=lambda r: r[3], reverse=True)
 
     out_path = args.out if args.out else os.path.splitext(shap_csv)[0] + f".sample{args.sample}.txt"
     with open(out_path, "w", encoding="utf-8") as outf:
         outf.write(f"sample={args.sample}\n")
-        outf.write("idx\ttoken_id\ttoken_str\tshap_value\n")
-        for i, tid in enumerate(token_ids):
-            outf.write(f"{i}\t{tid}\t{tokens[i]}\t{shap_vals[i] if i < len(shap_vals) else 0.0}\n")
+        outf.write("orig_idx\ttoken_id\ttoken_str\tshap_value\n")
+        for orig_idx, tid, tok, val in rows:
+            outf.write(f"{orig_idx}\t{tid}\t{tok}\t{val}\n")
 
     print(f"Wrote embedding-aware detokenized SHAP to: {out_path}")
 
