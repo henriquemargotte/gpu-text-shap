@@ -135,8 +135,7 @@ def main():
     with open(args.meta, "r", encoding="utf-8") as mf:
         meta = json.load(mf)
     tokenizer_name = args.tokenizer if args.tokenizer else meta.get("tokenizer")
-    if tokenizer_name is None:
-        raise RuntimeError("Tokenizer not found in meta; provide --tokenizer")
+    # tokenizer_name is optional; detokenization will use the exported `vocab.txt`
     vocab_size = int(meta.get("vocab_size", 30522))
 
     # Resolve embedding matrix path
