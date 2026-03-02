@@ -150,6 +150,7 @@ echo "Running emb_shap on exported dataset (this may take time). Output -> $OUT_
   --npermutations "$N_PERMUTATIONS" \
   --embeddings "$OUT_DIR/embedding_matrix.txt" \
   --threads "$THREADS" \
+  --sample "$SAMPLE_ID" \
   --print "$PRINT" > "$OUT_DIR/shap_values.txt" 2>&1 || true
 
 echo "SHAP output saved to: $OUT_DIR/shap_values.txt"

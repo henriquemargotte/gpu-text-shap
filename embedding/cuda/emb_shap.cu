@@ -274,6 +274,7 @@ int main(int argc, char** argv) {
     std::string emb_path = "out/embedding_matrix.txt"; // embedding file
     int threads = 128;
     int max_print = 10;
+    int sample = 0; // which sample to run shap on (default 0)
 
     for (int i = 1; i < argc; i++) {
         std::string a = argv[i];
@@ -282,6 +283,7 @@ int main(int argc, char** argv) {
         else if (a == "--embeddings" && i + 1 < argc) emb_path = argv[++i];
         else if (a == "--threads" && i + 1 < argc) threads = std::stoi(argv[++i]);
         else if (a == "--print" && i + 1 < argc) max_print = std::stoi(argv[++i]);
+        else if (a == "--sample" && i + 1 < argc) sample = std::stoi(argv[++i]);
         else {
             std::cerr << "Unknown/invalid arg: " << a << "\n";
             return 2;
@@ -344,7 +346,9 @@ int main(int argc, char** argv) {
         int* d_out_dims = nullptr;
         float* d_logits = nullptr;
 
-        checkCuda(cudaMalloc(&d_token_ids, ds.token_ids.size() * sizeof(int32_t)), "cudaMalloc token_ids");
+        if (sample < 0 || sample >= ds.n) throw std::runtime_error("sample index out of range");
+        size_t sample_tokens = (size_t)ds.seq_len;
+        checkCuda(cudaMalloc(&d_token_ids, sample_tokens * sizeof(int32_t)), "cudaMalloc token_ids");
         checkCuda(cudaMalloc(&d_embedding, emb.data.size() * sizeof(float)), "cudaMalloc embedding");
         checkCuda(cudaMalloc(&d_W, W_all.size() * sizeof(float)), "cudaMalloc W");
         checkCuda(cudaMalloc(&d_b, b_all.size() * sizeof(float)), "cudaMalloc b");
@@ -354,7 +358,8 @@ int main(int argc, char** argv) {
         checkCuda(cudaMalloc(&d_out_dims, out_dims.size() * sizeof(int)), "cudaMalloc out_dims");
         checkCuda(cudaMalloc(&d_logits, (size_t)2 * (size_t)n_permutations * sizeof(float)), "cudaMalloc logits");
 
-        checkCuda(cudaMemcpy(d_token_ids, ds.token_ids.data(), ds.token_ids.size() * sizeof(int32_t), cudaMemcpyHostToDevice), "memcpy token_ids");
+        checkCuda(cudaMemcpy(d_token_ids, ds.token_ids.data() + (size_t)sample * (size_t)ds.seq_len,
+                     sample_tokens * sizeof(int32_t), cudaMemcpyHostToDevice), "memcpy token_ids");
         checkCuda(cudaMemcpy(d_embedding, emb.data.data(), emb.data.size() * sizeof(float), cudaMemcpyHostToDevice), "memcpy embedding");
         checkCuda(cudaMemcpy(d_W, W_all.data(), W_all.size() * sizeof(float), cudaMemcpyHostToDevice), "memcpy W");
         checkCuda(cudaMemcpy(d_b, b_all.data(), b_all.size() * sizeof(float), cudaMemcpyHostToDevice), "memcpy b");
@@ -440,7 +445,7 @@ int main(int argc, char** argv) {
         if (sf) {
             sf << "feature_idx,token_id,shap_value\n";
             for (int j = 0; j < ds.seq_len; ++j) {
-                int32_t tok = ds.token_ids[(size_t)0 * (size_t)ds.seq_len + (size_t)j];
+                int32_t tok = ds.token_ids[(size_t)sample * (size_t)ds.seq_len + (size_t)j];
                 sf << j << "," << tok << "," << shap_values[(size_t)j] << "\n";
             }
             sf.close();
@@ -451,7 +456,6 @@ int main(int argc, char** argv) {
 
         if (ds.n > 0) {
             std::vector<float> cur(emb.embed_dim);
-            int sample = 0;
             for (int j = 0; j < ds.seq_len; ++j) {
                 int32_t tok = ds.token_ids[(size_t)sample * (size_t)ds.seq_len + (size_t)j];
                 for (int d = 0; d < emb.embed_dim; ++d) {
