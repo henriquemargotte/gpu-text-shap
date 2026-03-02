@@ -162,6 +162,30 @@ else
   echo "Could not parse final test accuracy from train log: $TRAIN_LOG"
 fi
 
+# Run Python SHAP computation (permutation + linear) using the exported files
+PERM_OUT="$OUT_DIR/${DATASET_FILE}.sample${SAMPLE_ID}.compute_shap.permutation.txt"
+LINEAR_OUT="$OUT_DIR/${DATASET_FILE}.sample${SAMPLE_ID}.compute_shap.linear.txt"
+echo "[3.1] Compute SHAP (permutation) -> $PERM_OUT"
+python3 "$ROOT_DIR/embedding/python/compute_shap_emb.py" \
+  --weights "$OUT_DIR/$WEIGHTS_FILE" \
+  --dataset "$OUT_DIR/$DATASET_FILE" \
+  --meta "$OUT_DIR/$META_FILE" \
+  --embeddings "$OUT_DIR/embedding_matrix.txt" \
+  --sample "$SAMPLE_ID" \
+  --explainer permutation \
+  --npermutations "$N_PERMUTATIONS" \
+  --out "$PERM_OUT" 2>&1 | tee "$OUT_DIR/compute_shap_permutation.log" || true
+
+echo "[3.2] Compute SHAP (linear) -> $LINEAR_OUT"
+python3 "$ROOT_DIR/embedding/python/compute_shap_emb.py" \
+  --weights "$OUT_DIR/$WEIGHTS_FILE" \
+  --dataset "$OUT_DIR/$DATASET_FILE" \
+  --meta "$OUT_DIR/$META_FILE" \
+  --embeddings "$OUT_DIR/embedding_matrix.txt" \
+  --sample "$SAMPLE_ID" \
+  --explainer linear \
+  --out "$LINEAR_OUT" 2>&1 | tee "$OUT_DIR/compute_shap_linear.log" || true
+
 echo "[4/4] Detokenize SHAP for sample $SAMPLE_ID -> $OUT_DIR/sample${SAMPLE_ID}_shap.txt"
 python3 "$ROOT_DIR/embedding/python/detokenize_shap_emb.py" \
   --dataset "$OUT_DIR/$DATASET_FILE" \
@@ -169,3 +193,15 @@ python3 "$ROOT_DIR/embedding/python/detokenize_shap_emb.py" \
   --shap-csv "$OUT_DIR/$DATASET_FILE.shap_values.csv" \
   --sample "$SAMPLE_ID" \
   --out "$OUT_DIR/sample${SAMPLE_ID}_shap.txt"
+
+# Also make the compute_shap_emb outputs easy to find (they already include detokenized tokens)
+PERM_OUT="$OUT_DIR/${DATASET_FILE}.sample${SAMPLE_ID}.compute_shap.permutation.txt"
+LINEAR_OUT="$OUT_DIR/${DATASET_FILE}.sample${SAMPLE_ID}.compute_shap.linear.txt"
+if [[ -f "$PERM_OUT" ]]; then
+  cp "$PERM_OUT" "$OUT_DIR/sample${SAMPLE_ID}_shap.permutation.txt"
+  echo "copied permutation SHAP detokenized output to $OUT_DIR/sample${SAMPLE_ID}_shap.permutation.txt"
+fi
+if [[ -f "$LINEAR_OUT" ]]; then
+  cp "$LINEAR_OUT" "$OUT_DIR/sample${SAMPLE_ID}_shap.linear.txt"
+  echo "copied linear SHAP detokenized output to $OUT_DIR/sample${SAMPLE_ID}_shap.linear.txt"
+fi
