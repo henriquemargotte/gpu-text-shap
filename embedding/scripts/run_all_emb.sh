@@ -194,16 +194,6 @@ for SAMPLE_ID in $(seq 0 $((N_DATASET - 1))); do
     --npermutations "$N_PERMUTATIONS" \
     --out "$PERM_OUT" 2>&1 | tee "$OUT_DIR/compute_shap_permutation.sample${SAMPLE_ID}.log" || true
 
-  echo "[3.2] Compute SHAP (linear) -> $LINEAR_OUT"
-  python3 "$ROOT_DIR/embedding/python/compute_shap_emb.py" \
-    --weights "$OUT_DIR/$WEIGHTS_FILE" \
-    --dataset "$OUT_DIR/$DATASET_FILE" \
-    --meta "$OUT_DIR/$META_FILE" \
-    --embeddings "$OUT_DIR/embedding_matrix.txt" \
-    --sample "$SAMPLE_ID" \
-    --explainer linear \
-    --out "$LINEAR_OUT" 2>&1 | tee "$OUT_DIR/compute_shap_linear.sample${SAMPLE_ID}.log" || true
-
   # Detokenize SHAP for this sample -> per-sample detokenized output
   echo "[4] Detokenize SHAP for sample $SAMPLE_ID -> $OUT_DIR/sample${SAMPLE_ID}_shap.txt"
   # use the per-sample CSV produced/moved above
@@ -218,9 +208,6 @@ for SAMPLE_ID in $(seq 0 $((N_DATASET - 1))); do
   # Also make the compute_shap_emb outputs easy to find (they already include detokenized tokens)
   if [[ -f "$PERM_OUT" ]]; then
     cp "$PERM_OUT" "$OUT_DIR/sample${SAMPLE_ID}_shap.permutation.txt"
-  fi
-  if [[ -f "$LINEAR_OUT" ]]; then
-    cp "$LINEAR_OUT" "$OUT_DIR/sample${SAMPLE_ID}_shap.linear.txt"
   fi
 
   # Collect SHAP timing information (CUDA and Python permutation) and save one CSV row per sample
