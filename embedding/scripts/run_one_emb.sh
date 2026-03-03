@@ -205,3 +205,30 @@ if [[ -f "$LINEAR_OUT" ]]; then
   cp "$LINEAR_OUT" "$OUT_DIR/sample${SAMPLE_ID}_shap.linear.txt"
   echo "copied linear SHAP detokenized output to $OUT_DIR/sample${SAMPLE_ID}_shap.linear.txt"
 fi
+
+# Collect SHAP timing information (CUDA and Python explainers) and save to CSV
+TIMES_FILE="$OUT_DIR/shap_times.csv"
+if [[ ! -f "$TIMES_FILE" ]]; then
+  echo "sample,explainer,time_s" > "$TIMES_FILE"
+fi
+
+# CUDA kernel time (ms -> s)
+cuda_ms=$(grep -o 'cuda_kernel_time_ms=[0-9.]*' "$OUT_DIR/shap_values.txt" | tail -n1 | cut -d= -f2 || true)
+if [[ -n "$cuda_ms" ]]; then
+  cuda_s=$(awk "BEGIN{printf \"%.6f\", $cuda_ms/1000}")
+  echo "${SAMPLE_ID},cuda,${cuda_s}" >> "$TIMES_FILE"
+fi
+
+# Python permutation explainer time (seconds)
+perm_s=$(grep -o 'permutation_explainer_eval_time=[0-9.]*s' "$OUT_DIR/compute_shap_permutation.log" 2>/dev/null | tail -n1 | sed 's/.*=//' | sed 's/s$//' || true)
+if [[ -n "$perm_s" ]]; then
+  echo "${SAMPLE_ID},permutation,${perm_s}" >> "$TIMES_FILE"
+fi
+
+# Python linear explainer time (seconds)
+lin_s=$(grep -o 'linear_explainer_eval_time=[0-9.]*s' "$OUT_DIR/compute_shap_linear.log" 2>/dev/null | tail -n1 | sed 's/.*=//' | sed 's/s$//' || true)
+if [[ -n "$lin_s" ]]; then
+  echo "${SAMPLE_ID},linear,${lin_s}" >> "$TIMES_FILE"
+fi
+
+echo "Saved SHAP timing(s) to: $TIMES_FILE"
