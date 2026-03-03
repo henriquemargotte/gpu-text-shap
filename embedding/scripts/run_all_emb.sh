@@ -223,4 +223,45 @@ for SAMPLE_ID in $(seq 0 $((N_DATASET - 1))); do
     cp "$LINEAR_OUT" "$OUT_DIR/sample${SAMPLE_ID}_shap.linear.txt"
   fi
 
+  # Collect SHAP timing information (CUDA and Python permutation) and save one CSV row per sample
+  TIMES_FILE="$OUT_DIR/shap_times.csv"
+  if [[ ! -f "$TIMES_FILE" ]]; then
+    echo "sample,cuda_time,permutation_time" > "$TIMES_FILE"
+  fi
+
+  # CUDA kernel time (ms -> s) from per-sample shap_values log
+  cuda_ms=$(grep -o 'cuda_kernel_time_ms=[0-9.]*' "$OUT_DIR/shap_values_sample${SAMPLE_ID}.txt" | tail -n1 | cut -d= -f2 || true)
+  if [[ -n "$cuda_ms" ]]; then
+    cuda_s=$(awk "BEGIN{printf \"%.6f\", $cuda_ms/1000}")
+  else
+    cuda_s=""
+  fi
+
+  # Python permutation explainer time (seconds)
+  perm_s=$(grep -o 'permutation_explainer_eval_time=[0-9.]*s' "$OUT_DIR/compute_shap_permutation.sample${SAMPLE_ID}.log" 2>/dev/null | tail -n1 | sed 's/.*=//' | sed 's/s$//' || true)
+  if [[ -z "$perm_s" ]]; then
+    perm_s=""
+  fi
+
+  echo "${SAMPLE_ID},${cuda_s},${perm_s}" >> "$TIMES_FILE"
+  echo "Saved SHAP timing(s) for sample ${SAMPLE_ID} to: $TIMES_FILE"
+
+  # Generate detailed summaries (top/bottom tokens) for CUDA and permutation explainers
+  GEN_SCRIPT="$ROOT_DIR/embedding/scripts/generate_shap_summaries.py"
+  if [[ -f "$GEN_SCRIPT" ]]; then
+    echo "Generating detailed SHAP summaries for sample ${SAMPLE_ID} (CUDA + permutation)"
+    python3 "$GEN_SCRIPT" \
+      --out-dir "$OUT_DIR" \
+      --sample "$SAMPLE_ID" \
+      --vocab "$OUT_DIR/vocab.txt" \
+      --cuda-shap-csv "$DST_CSV" \
+      --cuda-log "$OUT_DIR/shap_values_sample${SAMPLE_ID}.txt" \
+      --perm-detok "$OUT_DIR/sample${SAMPLE_ID}_shap.permutation.txt" \
+      --perm-log "$OUT_DIR/compute_shap_permutation.sample${SAMPLE_ID}.log" \
+      --logits-file "$OUT_DIR/test_logits_sorted.csv" || true
+    echo "Wrote summaries: $OUT_DIR/cuda_shap_summary.csv and $OUT_DIR/permutation_shap_summary.csv (appended)"
+  else
+    echo "Summary generator not found: $GEN_SCRIPT" >&2
+  fi
+
 done
