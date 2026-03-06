@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "/home/margotte/shap-text-gpu/embedding/python/compute_shap_emb.py", line 356, in <module>
+    main()
+  File "/home/margotte/shap-text-gpu/embedding/python/compute_shap_emb.py", line 252, in main
+    b_eff = model(zero_in).cpu().numpy().reshape(-1)
+  File "/home/margotte/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/margotte/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/margotte/shap-text-gpu/embedding/python/compute_shap_emb.py", line 209, in forward
+    emb = self.embedding(x)
+  File "/home/margotte/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1511, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/home/margotte/.local/lib/python3.8/site-packages/torch/nn/modules/module.py", line 1520, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/home/margotte/.local/lib/python3.8/site-packages/torch/nn/modules/sparse.py", line 163, in forward
+    return F.embedding(
+  File "/home/margotte/.local/lib/python3.8/site-packages/torch/nn/functional.py", line 2237, in embedding
+    return torch.embedding(weight, input, padding_idx, scale_grad_by_freq, sparse)
+RuntimeError: Expected tensor for argument #1 'indices' to have one of the following scalar types: Long, Int; but got torch.FloatTensor instead (while checking arguments for embedding)

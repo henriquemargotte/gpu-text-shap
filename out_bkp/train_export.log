@@ -1,0 +1,26 @@
+epoch=1 train_loss=0.6950 test_loss=0.6931 test_acc=0.5000
+epoch=2 train_loss=0.6914 test_loss=0.6929 test_acc=0.4922
+epoch=3 train_loss=0.6850 test_loss=0.6881 test_acc=0.5508
+epoch=4 train_loss=0.6472 test_loss=0.6672 test_acc=0.5898
+epoch=5 train_loss=0.5413 test_loss=0.6305 test_acc=0.6562
+epoch=6 train_loss=0.4475 test_loss=0.6381 test_acc=0.6836
+epoch=7 train_loss=0.3537 test_loss=0.7249 test_acc=0.6836
+epoch=8 train_loss=0.2711 test_loss=0.7421 test_acc=0.6953
+epoch=9 train_loss=0.1866 test_loss=0.8294 test_acc=0.6914
+epoch=10 train_loss=0.1309 test_loss=0.9755 test_acc=0.6953
+epoch=11 train_loss=0.0822 test_loss=1.0684 test_acc=0.6992
+epoch=12 train_loss=0.0478 test_loss=1.1703 test_acc=0.6953
+epoch=13 train_loss=0.0276 test_loss=1.2512 test_acc=0.7227
+epoch=14 train_loss=0.0185 test_loss=1.4589 test_acc=0.6953
+epoch=15 train_loss=0.0114 test_loss=1.4392 test_acc=0.7148
+epoch=16 train_loss=0.0044 test_loss=1.5765 test_acc=0.7148
+epoch=17 train_loss=0.0024 test_loss=1.6853 test_acc=0.7148
+epoch=18 train_loss=0.0017 test_loss=1.7611 test_acc=0.7109
+Early stopping: no improvement for 5 epochs (patience=5)
+restored best model with test_acc=0.7227 before export
+final_test_loss=1.2512 final_test_acc=0.7227
+wrote: /home/margotte/shap-text-gpu/out/test_logits_sorted.csv
+wrote: /home/margotte/shap-text-gpu/out/mlp_weights.txt
+wrote: /home/margotte/shap-text-gpu/out/tokenized_dataset.txt
+wrote: /home/margotte/shap-text-gpu/out/embedding_matrix.txt
+wrote: /home/margotte/shap-text-gpu/out/export_meta.json

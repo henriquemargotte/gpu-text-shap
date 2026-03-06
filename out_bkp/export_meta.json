@@ -1,0 +1,15 @@
+{
+  "dataset": "imdb",
+  "vocab_size": 28373,
+  "max_len": 128,
+  "embed_dim": 64,
+  "hidden_dim": 64,
+  "num_layers": 4,
+  "num_classes": 2,
+  "export": {
+    "weights_file": "mlp_weights.txt",
+    "dataset_file": "tokenized_dataset.txt",
+    "embedding_file": "embedding_matrix.txt"
+  },
+  "feature_transform": "embedding_mean_pool"
+}

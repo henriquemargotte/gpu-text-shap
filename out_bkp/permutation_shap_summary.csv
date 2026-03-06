@@ -1,0 +1,4 @@
+sample,class,logit,time,top1_token,top1_shap,top2_token,top2_shap,top3_token,top3_shap,top4_token,top4_shap,top5_token,top5_shap,bottom1_token,bottom1_shap,bottom2_token,bottom2_shap,bottom3_token,bottom3_shap,bottom4_token,bottom4_shap,bottom5_token,bottom5_shap
+10,0,4.43383694,2.331000,plot,5.602875,they,4.632219,dream,3.916285,drugs,3.168652,obsessed,1.494224,months,-3.873271,genre,-3.813788,think,-2.518875,and,-2.329174,invited,-2.066015
+10,0,4.43383694,2.330000,slasher,2.956746,pretty,1.565624,obsessed,1.450214,they,1.398804,nothing,1.320674,every,-1.997251,genre,-1.073722,months,-1.002015,think,-0.916002,<unk>,-0.842553
+167,0,9.60151863,2.333000,worse,6.682186,half,5.129895,would,2.314192,needless,2.299957,what,2.070660,on,-2.652009,voight,-2.410391,made,-1.936352,this,-1.765195,he,-1.578587

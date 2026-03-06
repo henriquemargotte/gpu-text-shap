@@ -1,0 +1,4 @@
+sample,class,logit,time,top1_token,top1_shap,top2_token,top2_shap,top3_token,top3_shap,top4_token,top4_shap,top5_token,top5_shap,bottom1_token,bottom1_shap,bottom2_token,bottom2_shap,bottom3_token,bottom3_shap,bottom4_token,bottom4_shap,bottom5_token,bottom5_shap
+10,0,4.43383694,0.019684,wet,2.087410,plot,1.616430,dream,1.370950,obsessed,1.364780,they,1.343070,think,-1.289310,invited,-1.131510,genre,-1.016430,think,-0.921393,school,-0.920421
+10,0,4.43383694,0.019788,wet,2.087410,plot,1.616430,dream,1.370950,obsessed,1.364780,they,1.343070,think,-1.289310,invited,-1.131510,genre,-1.016430,think,-0.921393,school,-0.920421
+167,0,9.60151863,0.019662,worst,1.545980,sit,1.348990,myself,1.174910,bad,0.995583,?,0.980096,say,-0.666994,on,-0.640503,tv,-0.639927,voight,-0.615319,this,-0.582788
