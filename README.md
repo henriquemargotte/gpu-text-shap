@@ -1,3 +1,5 @@
+# Documentação não atualizada. Código atual no diretório embedding.
+
 # linear_mlp_bert_cuda
 
 End-to-end demo:
